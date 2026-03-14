@@ -1,6 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+
+:root {
+  --app-font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+}
 
 @custom-variant dark (&:is(.dark *));
 
@@ -104,8 +109,8 @@
   --chart-1: oklch(0.809 0.105 251.813);
   --chart-2: oklch(0.623 0.214 259.815);
   --chart-3: oklch(0.546 0.245 262.881);
-  --chart-4: oklch(0.488 0.243 264.376);
-  --chart-5: oklch(0.424 0.199 265.638);
+  --chart-4: oklch(0.488 0 0.243 264.376);
+  --chart-5: oklch(0.424 0 0.199 265.638);
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.488 0.243 264.376);
@@ -122,8 +127,17 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--app-font-sans);
   }
   html {
-    @apply font-sans;
+    font-family: var(--app-font-sans);
   }
+}
+
+@layer utilities {
+  .bg-blob { position: absolute; border-radius: 9999px; filter: blur(56px); opacity: .12; transform: translate3d(0,0,0); pointer-events: none; }
+  .float { animation: float 8s ease-in-out infinite alternate; }
+  .fade-in { animation: fadeIn .45s ease both; }
+  @keyframes float { from { transform: translateY(0px) } to { transform: translateY(-14px) } }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px) } to { opacity: 1; transform: translateY(0) } }
 }
