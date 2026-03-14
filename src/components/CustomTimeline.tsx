@@ -46,6 +46,7 @@ function formatDate(timestamp: string): { date: string; time: string } {
 
 export default function CustomTimeline({ segments }: CustomTimelineProps) {
   const visible = segments.filter((s) => s.enabled !== false);
+  const [openCard, setOpenCard] = React.useState<string | null>(null);
 
   if (visible.length === 0) {
     return <p className="text-muted-foreground text-sm">No segments yet</p>;
@@ -55,6 +56,8 @@ export default function CustomTimeline({ segments }: CustomTimelineProps) {
     <Timeline defaultValue={visible.length}>
       {visible.map((segment, index) => {
         const { date, time } = formatDate(segment.timestamp);
+        const isOpen = openCard === segment.id;
+
         return (
           <TimelineItem key={segment.id} step={index + 1}>
             <TimelineHeader>
@@ -73,9 +76,12 @@ export default function CustomTimeline({ segments }: CustomTimelineProps) {
                   </div>
                 </div>
               </TimelineDate>
-              <HoverCard>
+              <HoverCard open={isOpen} onOpenChange={(open) => open ? setOpenCard(segment.id) : setOpenCard(null)}>
                 <HoverCardTrigger asChild>
-                  <div className="cursor-pointer flex-1">
+                  <div 
+                    className="cursor-pointer flex-1"
+                    onClick={() => setOpenCard(isOpen ? null : segment.id)}
+                  >
                     <TimelineTitle>{segment.title}</TimelineTitle>
                   </div>
                 </HoverCardTrigger>
