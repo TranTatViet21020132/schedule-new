@@ -20,9 +20,6 @@ type Segment = {
 };
 
 export default function Page() {
-  const [mounted, setMounted] = React.useState(false);
-  React.useEffect(() => setMounted(true), []);
-
   const [segments, setSegments] = useState<Segment[]>([]);
 
   React.useEffect(() => {
@@ -44,7 +41,7 @@ export default function Page() {
       setSegments([
         {
           id: "s-1",
-          timestamp: new Date().toISOString().slice(0, 16),
+          timestamp: "2024-03-15T10:00",
           title: "Welcome",
           description: "Initial invite and welcome message.",
           color: "#7c3aed",
@@ -55,9 +52,7 @@ export default function Page() {
         },
         {
           id: "s-2",
-          timestamp: new Date(Date.now() + 1000 * 60 * 60 * 24)
-            .toISOString()
-            .slice(0, 16),
+          timestamp: "2024-03-16T14:30",
           title: "Meet & Greet",
           description: "Casual meet and greet with snacks.",
           color: "#06b6d4",
@@ -121,8 +116,34 @@ export default function Page() {
     URL.revokeObjectURL(url);
   }, [segments]);
 
-  if (!mounted)
-    return <div className="container mx-auto py-10 px-6">Loading editor…</div>;
+  const importJSON = useCallback(() => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".json";
+    input.onchange = (e: any) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (event: any) => {
+        try {
+          const data = JSON.parse(event.target.result);
+          if (Array.isArray(data)) {
+            startTransition(() => {
+              setSegments(data);
+            });
+            alert("Timeline imported successfully!");
+          } else {
+            alert("Invalid JSON format. Expected an array of segments.");
+          }
+        } catch (error) {
+          alert("Failed to parse JSON file. Please check the file format.");
+        }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  }, []);
 
   return (
     <div className="container mx-auto py-10 px-6">
@@ -264,6 +285,9 @@ export default function Page() {
               </button>
               <button className="rounded border px-3 py-2" onClick={exportJSON}>
                 Export JSON
+              </button>
+              <button className="rounded border px-3 py-2" onClick={importJSON}>
+                Import JSON
               </button>
             </div>
           </div>
