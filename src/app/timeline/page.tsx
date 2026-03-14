@@ -19,19 +19,43 @@ export default function TimelinePage() {
   const [isLoaded, setIsLoaded] = React.useState(false);
 
   React.useEffect(() => {
-    // Load segments from localStorage after hydration
-    try {
-      const raw = localStorage.getItem("timeline:segments");
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed)) {
-          setSegments(parsed);
+    const loadSegments = async () => {
+      try {
+        // Try to load from API (Supabase)
+        const response = await fetch("/api/segments");
+        if (response.ok) {
+          const data = await response.json();
+          
+          // If it's an array of collections, get the most recent one
+          if (Array.isArray(data) && data.length > 0) {
+            const collection = data[0]; // Most recent first
+            if (collection.segments && Array.isArray(collection.segments)) {
+              setSegments(collection.segments);
+              setIsLoaded(true);
+              return;
+            }
+          }
         }
+      } catch (e) {
+        // API call failed, fall back to localStorage
       }
-    } catch (e) {
-      // ignore
-    }
-    setIsLoaded(true);
+
+      // Fall back to localStorage
+      try {
+        const raw = localStorage.getItem("timeline:segments");
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) {
+            setSegments(parsed);
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+      setIsLoaded(true);
+    };
+
+    loadSegments();
   }, []);
 
   return (
