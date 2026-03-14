@@ -22,7 +22,7 @@ type Segment = {
 export default function Page() {
   const [segments, setSegments] = useState<Segment[]>([]);
   const [syncStatus, setSyncStatus] = useState<"idle" | "syncing" | "synced">(
-    "idle"
+    "idle",
   );
   const [lastSyncTime, setLastSyncTime] = useState<string | null>(null);
 

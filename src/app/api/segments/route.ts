@@ -20,11 +20,14 @@ function getSupabaseClient() {
 
 export async function GET(request: NextRequest) {
   const client = getSupabaseClient();
-  
+
   if (!client) {
     return NextResponse.json(
-      { error: "Database not configured. Please set Supabase environment variables." },
-      { status: 503 }
+      {
+        error:
+          "Database not configured. Please set Supabase environment variables.",
+      },
+      { status: 503 },
     );
   }
 
@@ -43,7 +46,7 @@ export async function GET(request: NextRequest) {
       if (error) {
         return NextResponse.json(
           { error: "Segment collection not found" },
-          { status: 404 }
+          { status: 404 },
         );
       }
 
@@ -65,18 +68,21 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function POST(request: NextRequest) {
   const client = getSupabaseClient();
-  
+
   if (!client) {
     return NextResponse.json(
-      { error: "Database not configured. Please set Supabase environment variables." },
-      { status: 503 }
+      {
+        error:
+          "Database not configured. Please set Supabase environment variables.",
+      },
+      { status: 503 },
     );
   }
 
@@ -87,7 +93,7 @@ export async function POST(request: NextRequest) {
     if (!segments || !Array.isArray(segments)) {
       return NextResponse.json(
         { error: "Invalid segments data" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -102,7 +108,7 @@ export async function POST(request: NextRequest) {
           segments: segments,
           updated_at: new Date().toISOString(),
         } as any,
-        { onConflict: "id" }
+        { onConflict: "id" },
       )
       .select()
       .single();
@@ -115,18 +121,21 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function DELETE(request: NextRequest) {
   const client = getSupabaseClient();
-  
+
   if (!client) {
     return NextResponse.json(
-      { error: "Database not configured. Please set Supabase environment variables." },
-      { status: 503 }
+      {
+        error:
+          "Database not configured. Please set Supabase environment variables.",
+      },
+      { status: 503 },
     );
   }
 
@@ -137,7 +146,7 @@ export async function DELETE(request: NextRequest) {
     if (!id) {
       return NextResponse.json(
         { error: "Collection ID is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -154,7 +163,7 @@ export async function DELETE(request: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
