@@ -25,7 +25,7 @@ export default function TimelinePage() {
         const response = await fetch("/api/segments");
         if (response.ok) {
           const data = await response.json();
-          
+
           // If it's an array of collections, get the most recent one
           if (Array.isArray(data) && data.length > 0) {
             const collection = data[0]; // Most recent first

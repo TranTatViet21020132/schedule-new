@@ -48,9 +48,7 @@ function checkRateLimit(ip: string): boolean {
   return true;
 }
 
-function validateSegments(
-  segments: unknown,
-): segments is Array<{
+function validateSegments(segments: unknown): segments is Array<{
   id: string;
   timestamp: string;
   title: string;
@@ -197,10 +195,7 @@ export async function POST(request: NextRequest) {
     // Check payload size (max 1MB)
     const payloadSize = JSON.stringify(body).length;
     if (payloadSize > 1024 * 1024) {
-      return NextResponse.json(
-        { error: "Payload too large" },
-        { status: 413 },
-      );
+      return NextResponse.json({ error: "Payload too large" }, { status: 413 });
     }
 
     const collectionId = id || `collection_${Date.now()}`;
@@ -228,7 +223,9 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("POST /api/segments error:", error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Internal server error" },
+      {
+        error: error instanceof Error ? error.message : "Internal server error",
+      },
       { status: 500 },
     );
   }
