@@ -76,9 +76,14 @@ export default function CustomTimeline({ segments }: CustomTimelineProps) {
                   </div>
                 </div>
               </TimelineDate>
-              <HoverCard open={isOpen} onOpenChange={(open) => open ? setOpenCard(segment.id) : setOpenCard(null)}>
+              <HoverCard
+                open={isOpen}
+                onOpenChange={(open) =>
+                  open ? setOpenCard(segment.id) : setOpenCard(null)
+                }
+              >
                 <HoverCardTrigger asChild>
-                  <div 
+                  <div
                     className="cursor-pointer flex-1"
                     onClick={() => setOpenCard(isOpen ? null : segment.id)}
                   >
