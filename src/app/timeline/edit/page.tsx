@@ -21,6 +21,10 @@ type Segment = {
 
 export default function Page() {
   const [segments, setSegments] = useState<Segment[]>([]);
+  const [syncStatus, setSyncStatus] = useState<"idle" | "syncing" | "synced">(
+    "idle"
+  );
+  const [lastSyncTime, setLastSyncTime] = useState<string | null>(null);
 
   React.useEffect(() => {
     // Try load from localStorage first
@@ -66,14 +70,46 @@ export default function Page() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Persist to localStorage whenever segments change
-  React.useEffect(() => {
+  // Sync function to save to API and localStorage
+  const syncSegments = useCallback(async (segmentsToSync: Segment[]) => {
+    setSyncStatus("syncing");
+
+    // Save to localStorage (instant)
     try {
-      localStorage.setItem("timeline:segments", JSON.stringify(segments));
+      localStorage.setItem("timeline:segments", JSON.stringify(segmentsToSync));
     } catch (e) {
       // ignore
     }
-  }, [segments]);
+
+    // Save to database (async)
+    try {
+      await fetch("/api/segments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: "default",
+          name: "My Timeline",
+          segments: segmentsToSync,
+        }),
+      });
+      setSyncStatus("synced");
+      setLastSyncTime(new Date().toLocaleTimeString());
+
+      // Reset synced status after 3 seconds
+      setTimeout(() => setSyncStatus("idle"), 3000);
+    } catch (e) {
+      // Fail silently - user can still work with localStorage
+      setSyncStatus("idle");
+      console.warn("Failed to sync to database:", e);
+    }
+  }, []);
+
+  // Persist to localStorage and database whenever segments change
+  React.useEffect(() => {
+    if (segments.length > 0) {
+      syncSegments(segments);
+    }
+  }, [segments, syncSegments]);
 
   const updateSegment = useCallback((id: string, patch: Partial<Segment>) => {
     startTransition(() => {
@@ -276,7 +312,7 @@ export default function Page() {
               ))}
             </Accordion>
 
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap items-center">
               <button
                 className="rounded bg-primary px-3 py-2 text-white"
                 onClick={addSegment}
@@ -289,6 +325,25 @@ export default function Page() {
               <button className="rounded border px-3 py-2" onClick={importJSON}>
                 Import JSON
               </button>
+
+              {/* Sync Status Indicator */}
+              <div className="ml-auto flex items-center gap-2 text-xs text-muted-foreground">
+                {syncStatus === "syncing" && (
+                  <span className="flex items-center gap-1">
+                    <div className="h-2 w-2 rounded-full bg-blue-500 animate-pulse"></div>
+                    Syncing...
+                  </span>
+                )}
+                {syncStatus === "synced" && (
+                  <span className="flex items-center gap-1 text-green-600">
+                    <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                    Saved to cloud
+                  </span>
+                )}
+                {lastSyncTime && syncStatus !== "syncing" && (
+                  <span>Last saved: {lastSyncTime}</span>
+                )}
+              </div>
             </div>
           </div>
         </div>
