@@ -61,9 +61,9 @@ export function AccordionItem({
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.18 }}
-            className="px-4 pb-4 pt-0"
+            style={{ overflow: "hidden" }}
           >
-            {children}
+            <div className="px-4 pb-4 pt-0">{children}</div>
           </motion.div>
         )}
       </AnimatePresence>
